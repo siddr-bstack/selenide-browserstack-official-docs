@@ -26,6 +26,8 @@ public class TestSetup implements BeforeAllCallback, BeforeEachCallback, AfterEa
       "userName", username,
       "accessKey", accessKey
     ));
+    Configuration.timeout = 10000;
+
     log.info("Setup webdriver: remoteUrl='{}', username='{}', accessKey='{}'", Configuration.remote,
       username.replaceAll(".", "*"), accessKey.replaceAll(".", "*"));
   }

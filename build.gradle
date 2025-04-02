@@ -31,6 +31,8 @@ dependencies {
   testImplementation "org.assertj:assertj-core:$assertjVersion"
   testImplementation "org.slf4j:slf4j-api:$slf4jVersion"
   testRuntimeOnly "org.slf4j:slf4j-simple:$slf4jVersion"
+  implementation "com.browserstack:browserstack-java-sdk:latest.release"
+
 
   // Why it's needed?
   // It causes the runtime error:
@@ -42,6 +44,8 @@ configurations.configureEach {
   resolutionStrategy.cacheChangingModulesFor 30, 'seconds'
 }
 
+def browserstackSDKArtifact = configurations.compileClasspath.resolvedConfiguration.resolvedArtifacts.find { it.name == 'browserstack-java-sdk' }
+
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
   options.debug = true
@@ -50,7 +54,7 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    // languageVersion = JavaLanguageVersion.of(17)
   }
 }
 
@@ -62,12 +66,17 @@ tasks.withType(Test).configureEach {
   outputs.upToDateWhen {false}
 }
 
-tasks.register("chrome", Test) {
-  systemProperties['selenide.browser'] = 'chrome'
+tasks.withType(Test) {
+    systemProperties = System.properties
+    jvmArgs += "-javaagent:${browserstackSDKArtifact.file}"
 }
-tasks.register("firefox", Test) {
-  systemProperties['selenide.browser'] = 'firefox'
-}
-tasks.register("edge", Test) {
-  systemProperties['selenide.browser'] = 'edge'
-}
+
+// tasks.register("chrome", Test) {
+//   systemProperties['selenide.browser'] = 'chrome'
+// }
+// tasks.register("firefox", Test) {
+//   systemProperties['selenide.browser'] = 'firefox'
+// }
+// tasks.register("edge", Test) {
+//   systemProperties['selenide.browser'] = 'edge'
+// }
